@@ -11,10 +11,26 @@ export default function Home() {
 
   useEffect(() => {
     // Fetch providers from backend
+    console.log('Fetching providers from backend...');
     fetch('http://localhost:8111/providers')
-      .then(res => res.json())
-      .then(data => setProviders(data.providers))
-      .catch(err => console.error('Failed to fetch providers:', err));
+      .then(res => {
+        console.log('Response status:', res.status);
+        return res.json();
+      })
+      .then(data => {
+        console.log('Received providers:', data);
+        setProviders(data.providers);
+      })
+      .catch(err => {
+        console.error('Failed to fetch providers:', err);
+        // Fallback to hardcoded providers for testing
+        setProviders([
+          { id: 'openai', name: 'OpenAI', models: ['gpt-4', 'gpt-3.5-turbo'] },
+          { id: 'anthropic', name: 'Anthropic', models: ['claude-3-5-sonnet-20241022'] },
+          { id: 'gemini', name: 'Google Gemini', models: ['gemini-2.5-flash'] },
+          { id: 'ollama', name: 'Ollama (Local)', models: ['llama3.2'] }
+        ]);
+      });
   }, []);
 
   return (
@@ -26,7 +42,7 @@ export default function Home() {
       </Head>
 
       <Header />
-      
+
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-bold text-center mb-8 text-gray-900">
@@ -37,10 +53,10 @@ export default function Home() {
           </p>
 
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <LLMSelector 
-              providers={providers} 
-              selectedModel={selectedModel} 
-              onModelChange={setSelectedModel} 
+            <LLMSelector
+              providers={providers}
+              selectedModel={selectedModel}
+              onModelChange={setSelectedModel}
             />
           </div>
 

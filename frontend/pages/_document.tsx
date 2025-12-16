@@ -4,26 +4,24 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
-        {/* Prevent Chrome extension conflicts */}
+        {/* Prevent Chrome extension conflicts - immediate execution */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              // Prevent extension injection conflicts
-              if (typeof window !== 'undefined') {
-                // Override problematic extension methods
+              // Simple fix for Chrome extension chainId error
+              (function() {
                 const originalDefineProperty = Object.defineProperty;
                 Object.defineProperty = function(obj, prop, descriptor) {
                   try {
                     return originalDefineProperty.call(this, obj, prop, descriptor);
                   } catch (e) {
-                    // Silently ignore extension-related errors
-                    if (e.message && (e.message.includes('chainId') || e.message.includes('extension'))) {
-                      return obj;
+                    if (e && e.message && e.message.includes('chainId')) {
+                      return obj; // Silently ignore
                     }
                     throw e;
                   }
                 };
-              }
+              })();
             `,
           }}
         />

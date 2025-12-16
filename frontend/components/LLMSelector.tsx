@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface Provider {
   id: string;
@@ -14,6 +14,13 @@ interface LLMSelectorProps {
 
 export default function LLMSelector({ providers, selectedModel, onModelChange }: LLMSelectorProps) {
   const [selectedProvider, setSelectedProvider] = useState(providers[0]?.id || '');
+
+  useEffect(() => {
+    if (providers.length > 0 && !selectedProvider) {
+      setSelectedProvider(providers[0].id);
+      onModelChange(providers[0].models[0]);
+    }
+  }, [providers, selectedProvider, onModelChange]);
 
   const handleProviderChange = (providerId: string) => {
     setSelectedProvider(providerId);

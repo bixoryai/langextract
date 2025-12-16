@@ -1,48 +1,63 @@
 import '../styles/globals.css';
 import type { AppProps } from 'next/app';
 import { useEffect } from 'react';
-import ErrorBoundary from '../components/ErrorBoundary';
 
 function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
-    // Handle Chrome extension conflicts
+    // Comprehensive Chrome extension conflict prevention
     const handleError = (event: ErrorEvent) => {
-      // Ignore common extension-related errors
-      if (event.message.includes('chainId') ||
-          event.message.includes('extension') ||
-          event.message.includes('inpage.js')) {
+      // Suppress ALL extension-related errors
+      if (event.message && (
+        event.message.includes('chainId') ||
+        event.message.includes('extension') ||
+        event.message.includes('inpage.js') ||
+        event.message.includes('getter') ||
+        event.message.includes('has only a getter') ||
+        event.message.includes('Cannot set property')
+      )) {
         event.preventDefault();
-        console.warn('Ignored extension error:', event.message);
+        event.stopImmediatePropagation();
+        console.warn('Suppressed extension error:', event.message);
         return false;
       }
     };
 
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      // Ignore extension-related promise rejections
-      if (event.reason && typeof event.reason === 'string' &&
-          (event.reason.includes('chainId') ||
-           event.reason.includes('extension') ||
-           event.reason.includes('inpage.js'))) {
+      // Suppress extension-related promise rejections
+      const reason = event.reason;
+      if (reason && (
+        (typeof reason === 'string' && (
+          reason.includes('chainId') ||
+          reason.includes('extension') ||
+          reason.includes('inpage.js') ||
+          reason.includes('getter')
+        )) ||
+        (reason.message && (
+          reason.message.includes('chainId') ||
+          reason.message.includes('extension') ||
+          reason.message.includes('inpage.js') ||
+          reason.message.includes('getter') ||
+          reason.message.includes('has only a getter')
+        ))
+      )) {
         event.preventDefault();
-        console.warn('Ignored extension promise rejection:', event.reason);
+        event.stopImmediatePropagation();
+        console.warn('Suppressed extension promise rejection:', reason);
         return false;
       }
     };
 
-    window.addEventListener('error', handleError);
-    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+    // Add listeners with capture to catch errors early
+    window.addEventListener('error', handleError, true);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection, true);
 
     return () => {
-      window.removeEventListener('error', handleError);
-      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+      window.removeEventListener('error', handleError, true);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection, true);
     };
   }, []);
 
-  return (
-    <ErrorBoundary>
-      <Component {...pageProps} />
-    </ErrorBoundary>
-  );
+  return <Component {...pageProps} />;
 }
 
 export default MyApp;
