@@ -6,7 +6,7 @@ import LLMSelector from '../components/LLMSelector';
 import TextExtractor from '../components/TextExtractor';
 
 export default function Home() {
-  const [selectedModel, setSelectedModel] = useState('gemini-2.5-flash');
+  const [selectedModel, setSelectedModel] = useState('gpt-4');
   const [providers, setProviders] = useState([]);
 
   useEffect(() => {
