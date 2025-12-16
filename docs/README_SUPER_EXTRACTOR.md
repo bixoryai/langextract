@@ -47,6 +47,20 @@ npm install
 npm run dev
 ```
 
+#### Quick Launch Script
+
+For convenience, you can use the provided `start.sh` script to launch both frontend and backend simultaneously:
+
+```bash
+./start.sh
+```
+
+This will start:
+- Backend on `http://localhost:8111`
+- Frontend on `http://localhost:1234`
+
+Press `Ctrl+C` to stop both services.
+
 ## API Endpoints
 
 - `GET /providers` - List available LLM providers
